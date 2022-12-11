@@ -30,5 +30,6 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Host $http_host;
         proxy_pass http://api:${API_PORT};
+        proxy_buffering off;
     }
 }

@@ -11,7 +11,9 @@
     <noscript>
       <strong>Please enable JavaScript to continue.</strong>
     </noscript>
-    <div id="app">[MVP APP]</div>
+    <div id="app"><input type="button" value="[MVP APP]"><pre></pre></div>
+    <h4>Packets:</h4>
+    <ol id="messages"></ol>
     <script>
       function testApi(node) {
         fetch('/api/test', {
@@ -36,11 +38,26 @@
           alert(err.message);
         });
       }
+      function updateMessage (message) {
+        var root = document.getElementById('messages');
+        var el = document.createElement('li');
+        el.textContent = message;
+        root.appendChild(el)
+      }
       window.addEventListener('load', function() {
-        var el = document.getElementById('app');
-        el.addEventListener('click', function() {
+        var btn = document.querySelector('#app input'),el = document.querySelector('#app pre');
+        btn.addEventListener('click', function() {
           testApi(el);
         });
+        var eventSource = new EventSource('http://localhost:3000/api/stream');
+        eventSource.onmessage = function (event) {
+          console.log('onmessage:', event)
+          updateMessage(event.data);
+        }
+        eventSource.onerror = function () {
+          updateMessage('Server closed connection')
+          eventSource.close();
+        }
       });
     </script>
   </body>
