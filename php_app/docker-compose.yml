@@ -1,0 +1,86 @@
+version: "3.8"
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    app-vendor:
+        driver: local
+    db-data:
+        driver: local
+
+services:
+
+    php:
+        env_file: .env
+        container_name: app-php
+        restart: unless-stopped
+        tty: true
+        build:
+            context: ./
+            dockerfile: ./php-fpm/Dockerfile
+            args:
+                WORK_DIR: ${WORK_DIR}
+                DB_HOST: ${DB_HOST}
+                DB_PORT: ${DB_PORT}
+                DB_DATABASE: ${DB_DATABASE}
+                DB_USERNAME: ${DB_USERNAME}
+                DB_PASSWORD: ${DB_PASSWORD}
+        environment:
+            SERVICE_NAME: php
+            SERVICE_TAGS: dev
+        working_dir: ${WORK_DIR}
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./src:${WORK_DIR}
+            - app-vendor:${WORK_DIR}/vendor
+        networks:
+            - app-network
+
+    db:
+        image: mysql:5.7.29
+        container_name: app-db
+        restart: unless-stopped
+        tty: true
+        env_file: .env
+        ports:
+            - "3306:3306"
+        volumes:
+            - db-data:/var/lib/mysql
+            - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            SERVICE_NAME: mysql
+            SERVICE_TAGS: dev
+        networks:
+            - app-network
+
+    nginx:
+        image: nginx:alpine
+        container_name: app-nginx
+        restart: unless-stopped
+        tty: true
+        build:
+            context: ./
+            dockerfile: ./nginx/Dockerfile
+            args:
+                WORK_DIR: ${WORK_DIR}
+                API_PORT: '9000'
+        ports:
+            - 8000:80
+        volumes:
+            - ./src:${WORK_DIR}
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+        environment:
+            WORK_DIR: ${WORK_DIR}
+            PHPFPM_PORT: '9000'
+        networks:
+            - app-network
+        depends_on:
+            - php
+            - db
