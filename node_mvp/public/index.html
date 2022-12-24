@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="icon" href="favicon.ico">
+    <title>api test app</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>Please enable JavaScript to continue.</strong>
+    </noscript>
+    <div id="app"><input type="button" value="[TEST API]"><pre></pre></div>
+    <h4>Packets:</h4>
+    <ol id="messages"></ol>
+    <script>
+      function testApi(node) {
+        fetch('/api/test', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          mode: 'cors',
+          cache: 'no-cache',
+        })
+        .then(function(res) {
+          return res.json();
+        })
+        .then(function(data) {
+          console.log('*[responce]', data);
+          if (node) {
+            node.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+          }
+        })
+        .catch(function(err) {
+          console.error(err);
+          alert(err.message);
+        });
+      }
+      function updateMessage (message) {
+        var root = document.getElementById('messages');
+        var el = document.createElement('li');
+        el.textContent = message;
+        root.appendChild(el);
+      }
+      window.addEventListener('load', function() {
+        var btn = document.querySelector('#app input'),el = document.querySelector('#app pre');
+        btn.addEventListener('click', function() {
+          testApi(el);
+        });
+        var eventSource = new EventSource('/api/stream', { withCredentials: true });
+        eventSource.onopen = () => {
+          updateMessage('Connection opened');
+        };
+        eventSource.onmessage = function (event) {
+          console.log('*onmessage:', event);
+          updateMessage(event.data);
+        }
+        eventSource.onerror = function () {
+          updateMessage('Server closed connection');
+          eventSource.close();
+        }
+        eventSource.addEventListener('serverUpdate', event => {
+          console.log('*event', event);
+          updateMessage(event.data);
+        });
+      });
+    </script>
+  </body>
+</html>

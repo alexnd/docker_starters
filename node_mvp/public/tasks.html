@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="icon" href="favicon.ico">
+    <title>api register test</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>Please enable JavaScript to continue.</strong>
+    </noscript>
+    <h4>Tasks</h4>
+    <form id="formAuth" style="display:none;">
+      <a href="login.html">Login</a> or provide authorization token
+      <div style="padding:1rem">
+        <input type="text" name="token" placeholder="Token">
+      </div>
+      <div style="padding:1rem">
+        <input type="button" value="[authorize and load data]" onclick="onLoadPage(event)">
+      </div>
+    </form>
+    <pre style="padding:1.2rem;" id="output"></pre>
+    <ol id="tasks" style="margin:1rem;"></ol>
+    <p id="authorized" style="display:none;">
+      <form id="formData" style="padding: 1.2rem;">
+        New task<input type="text" name="name"><input type="button" value="[add]" onclick="onTaskAdd(event)">
+      </form>
+      <input type="button" value="[logout]" onclick="onLogout(event)">
+    </p>
+    <script>
+      var nodeFormAuth = document.getElementById('formAuth');
+      var nodeFormData = document.getElementById('formData');
+      var nodeTasks = document.getElementById('tasks');
+      var nodeOutput = document.getElementById('output');
+      var nodeAuthorized = document.getElementById('authorized');
+
+      function tasksApi(token) {
+        return new Promise(function(resolve, reject) {
+          fetch('/api/tasks', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            mode: 'cors',
+            cache: 'no-cache',
+          })
+          .then(function(res) {
+            return res.json();
+          })
+          .then(function(data) {
+            console.log('*[responce]', data);
+            resolve(data);
+          })
+          .catch(function(err) {
+            console.error(err);
+            reject(err);
+          });
+        });
+      }
+      function taskAddApi(token, payload) {
+        return new Promise(function(resolve, reject) {
+          fetch('/api/tasks', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            mode: 'cors',
+            cache: 'no-cache',
+            body: JSON.stringify(payload)
+          })
+          .then(function(res) {
+            return res.json();
+          })
+          .then(function(data) {
+            if (data) {
+              if (data.error) reject(new Error(data.error));
+              else if (data.success) resolve(data);
+              else reject(new Error('Access denied'));
+            }
+            else reject(new Error('Not implemented on server'));
+          })
+          .catch(function(err) {
+            console.error(err);
+            reject(err);
+          });
+        });
+      }
+      function onLoadPage(event) {
+        nodeFormAuth.style.display = 'none';
+        nodeFormData.style.display = 'none';
+        nodeTasks.style.display = 'none';
+        nodeAuthorized.style.display = 'none';
+        nodeOutput.innerHTML = '';
+        nodeTasks.innerHTML = '';
+        var token = localStorage.getItem('auth-token');
+        if (!token) {
+          token = nodeFormAuth.querySelector('input[name="token"]').value;
+        }
+        if (!token) {
+          nodeFormAuth.style.display = 'block';
+          alert('Not authorized');
+        } else tasksApi(token)
+          .then(function(result) {
+            if (result.error) {
+              nodeOutput.innerHTML = JSON.stringify(result, null, 2);
+            } else {
+              nodeFormData.style.display = 'block';
+              nodeTasks.style.display = 'block';
+              nodeAuthorized.style.display = 'block';
+              if (Array.isArray(result) && result.length) {
+                for (var task of result) {
+                  var el = document.createElement('li');
+                  el.textContent = JSON.stringify(task);
+                  nodeTasks.appendChild(el);
+                }
+                nodeOutput.style.display = 'none';
+              } else {
+                nodeOutput.innerHTML = 'Result has no data';
+              }
+            }
+          })
+          .catch(function(err) {
+            nodeOutput.innerHTML = 'Error\n' + err.message;
+            nodeFormAuth.style.display = 'block';
+          });
+      }
+      function onTaskAdd(event) {
+        var nodeName = nodeFormData.querySelector('input[name="name"]');
+        var name = nodeName.value;
+        name = name.trim();
+        if (name !== '') {
+          var token = localStorage.getItem('auth-token');
+          taskAddApi(token, {'name': name})
+            .then(function(result) {
+              console.log('*onTaskAdd result', result);
+              nodeName.value = '';
+              onLoadPage();
+            })
+            .catch(function(err) {
+              nodeOutput.innerHTML = 'Error\n' + err.message;
+            })
+        } else {
+          alert('Task Name required');
+        }
+      }
+      function onLogout(event) {
+        localStorage.removeItem('auth-token');
+        location.href = 'login.html';
+      }
+      window.onload = onLoadPage;
+    </script>
+  </body>
+</html>

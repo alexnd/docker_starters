@@ -10,8 +10,12 @@ Before setup feel free to modify `docker-compose.yml`, any `Dockerfile`, add oth
 
 ## `node_app` - Nodejs minimal app
 
+## `node_mvp` - Nodejs app with JWT authorization, websockets and TingoDB models
+
 ## `php_app` - PHP 8 with Composer minimal app
 
 ## `wp_app` - WordPress (PHP) + Mysql + Phpmyadmin
+
+## `php7_app` - PHP 7 + Mysql 5 + Composer
 
 To roll new **Laravel 9 PHP** application see separate repository - [Laravel app](https://github.com/alexnd/laravel_app)

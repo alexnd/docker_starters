@@ -1,0 +1,40 @@
+version: '3.8'
+
+networks:
+    mvp-network:
+        driver: bridge
+
+volumes:
+    mvp-modules:
+        driver: local
+
+services:
+
+    api:
+        container_name: mvp-api
+        restart: unless-stopped
+        build:
+            context: ./
+            dockerfile: ./docker_files/api/Dockerfile
+        ports:
+            - '3001:3000'
+        volumes:
+            - ./:/app
+            - 'mvp-modules:/app/node_modules'
+        networks:
+            - mvp-network
+
+    nginx:
+        container_name: mvp-nginx
+        restart: unless-stopped
+        tty: true
+        image: nginx:stable-alpine
+        ports:
+            - '8001:80'
+        volumes:
+            - ./:/app
+            - ./docker_files/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - mvp-network
+        depends_on:
+            - api

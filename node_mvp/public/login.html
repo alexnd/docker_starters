@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <link rel="icon" href="favicon.ico">
+    <title>api login test</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>Please enable JavaScript to continue.</strong>
+    </noscript>
+    <h4>Authorization</h4>
+    <form method="POST" action="" id="formLogin">
+      <div style="padding:1rem">
+        <input type="text" name="username" placeholder="Username">
+      </div>
+      <div style="padding:1rem">
+        <input type="password" name="password" placeholder="Password">
+      </div>
+      <div style="padding:1rem">
+        <input type="button" value="[login]" onclick="onLogin(event)">
+      </div>
+      <p><a href="register.html">Register</a>
+    </form>
+    <div id="app" style="padding:1.2rem;"><pre></pre></div>
+    <script>
+      function loginApi(username, password) {
+        return new Promise(function(resolve, reject) {
+          var payload = JSON.stringify({'username':username, 'password':password});
+          fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            mode: 'cors',
+            cache: 'no-cache',
+            body: payload
+          })
+          .then(function(res) {
+            return res.json();
+          })
+          .then(function(data) {
+            if (data) {
+              if (data.error) reject(new Error(data.error));
+              else if (data.success) resolve(data);
+              else reject(new Error('Access denied'));
+            }
+            else reject(new Error('Not implemented on server'));
+          })
+          .catch(function(err) {
+            console.error(err);
+            reject(err);
+          });
+        });
+        
+      }
+      function onLogin (event) {
+        var el = document.getElementById('formLogin');
+        var login = el.querySelector('input[name="username"]').value;
+        var paswd = el.querySelector('input[name="password"]').value;
+        if (login && paswd) {
+          var node = document.querySelector('#app pre');
+          loginApi(login, paswd)
+            .then(function(result) {
+              console.log('*[login responce]', result);
+              if (result.success && result.token) {
+                localStorage.setItem('auth-token', result.token);
+              }
+              node.innerHTML = '<pre>' + (result.success ? 'Success\n': '') + JSON.stringify(result, null, 2) + '</pre>'
+               + (result.success ? '<p><a href="tasks.html">Go to tasks</a>' : '');
+            })
+            .catch(function(err) {
+              node.innerHTML = '<pre>Error\n' + (err && err.message ? err.message : '') + '</pre>';
+            });
+        } else {
+          alert('Credentials needed');
+        }
+      }
+    </script>
+  </body>
+</html>
