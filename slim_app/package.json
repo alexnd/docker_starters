@@ -1,0 +1,20 @@
+{
+  "name": "slim-app",
+  "version": "1.0.0",
+  "description": "App template on PHP Slim4",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node postinstall.js",
+    "install-web": "npm install --prefix web",
+    "start": "node server.js",
+    "start-web": "npm run serve --prefix web",
+    "build-web": "npm run build --prefix web",
+    "serve-web": "serve -p web -l 8888"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serve": "^13.0.2"
+  }
+}

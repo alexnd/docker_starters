@@ -1,0 +1,8 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs></defs>
+  <rect x="0" y="0" width="512" height="512" style="stroke: rgb(0, 0, 0); paint-order: stroke; stroke-width: 2px; fill: rgb(255, 255, 0);"></rect>
+  <path d="M 255.374 3.03 L 503.149 129.366 L 503.149 382.036 L 255.374 508.372 L 7.599 382.037 L 7.599 129.365 Z" style="stroke: rgb(0, 0, 0); stroke-width: 0px; paint-order: stroke; fill: rgb(204, 255, 204);" bx:shape="n-gon 255.374 255.701 286.106 252.671 6 0 1@831b60c0"></path>
+  <text style="fill: rgb(51, 0, 255); font-family: Arial, sans-serif; font-size: 13.1px; stroke-width: 0.98691px; white-space: pre;" transform="matrix(18.431271, 0, 0, 17.667767, -5.448087, -236.819595)" x="10.656" y="25.558">D</text>
+  <text style="fill: rgb(51, 0, 255); font-family: Arial, sans-serif; font-size: 13.1px; stroke-width: 0.98691px; white-space: pre;" transform="matrix(18.431271, 0, 0, 18.8764, -175.030212, -115.188736)" x="10.656" y="25.558">H</text>
+  <text style="fill: rgb(51, 0, 255); font-family: Arial, sans-serif; font-size: 13.1px; stroke-width: 0.98691px; white-space: pre;" transform="matrix(18.431271, 0, 0, 16.678883, 132.673187, -38.442146)" x="10.656" y="25.558">B</text>
+</svg>

@@ -1,0 +1,70 @@
+version: "3.8"
+
+networks:
+  lan:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local
+  app-vendor:
+    driver: local
+
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: app-nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    tty: true
+    volumes:
+      - .:/app
+      - ./_docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+      - db
+    networks:
+      - lan
+
+  db:
+    image: mysql:5.7.29
+    container_name: app-db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - lan
+
+  php:
+    build:
+      context: ./
+      dockerfile: ./_docker/php-fpm/Dockerfile
+      args:
+        DB_HOST: ${DB_HOST}
+        DB_PORT: ${DB_PORT}
+        DB_DATABASE: ${DB_DATABASE}
+        DB_USERNAME: ${DB_USERNAME}
+        DB_PASSWORD: ${DB_PASSWORD}
+    container_name: app-php
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - ./_docker/php-fpm/crontab:/etc/cron.d/crontab
+    working_dir: /app
+    ports:
+      - "9000:9000"
+    networks:
+      - lan
