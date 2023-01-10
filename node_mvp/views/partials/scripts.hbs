@@ -1,0 +1,129 @@
+<script>
+var currentUser = {};
+window.onload = function () {
+  var flashMessage = localStorage.getItem('flash-message');
+  if (flashMessage) {
+    showMessage(flashMessage);
+    localStorage.removeItem('flash-message');
+  }
+  var flashError = localStorage.getItem('flash-error');
+  if (flashError) {
+    showError(flashError);
+    localStorage.removeItem('flash-error');
+  }
+  var token = localStorage.getItem('auth-token');
+  if (token) {
+    authTokenApi(token).then(function (result) {
+      if (result) {
+        currentUser.authToken = token;
+        switchAuthNavigation(true);
+        fetchUserApi(token).then(function (data) {
+          currentUser = Object.assign(currentUser, data);
+        }).catch(function(err) {
+          showError(err);
+        });
+      } else {
+        switchAuthNavigation(false);
+      }
+    }).catch(function(err) {
+      showError(err);
+      switchAuthNavigation(false);
+    }).finally(function () {
+      tryInitPage();
+    });
+  } else {
+    tryInitPage()
+  }
+}
+function tryInitPage() {
+  setTimeout(function () {
+    if (typeof pageInit === 'function') pageInit();
+  }, 1000);
+}
+function getInitdata() {
+  var el = document.getElementById('initdata');
+  if (!el) return {};
+  try {
+    return JSON.parse(el.text);
+  } catch (err) {
+    console.error(err);
+  }
+}
+function authTokenApi(token) {
+  return new Promise(function(resolve, reject) {
+    fetch('/api/auth', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      mode: 'cors',
+      cache: 'no-cache',
+    })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        console.log('*[authTokenApi response]', data);
+        resolve(data && data.success);
+      })
+      .catch(function(err) {
+        reject(err.message || 'Something went wrong');
+      });
+  });
+}
+function fetchUserApi(token) {
+  return new Promise(function(resolve, reject) {
+    fetch('/api/auth/user', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      mode: 'cors',
+      cache: 'no-cache',
+    })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        console.log('*[fetchUserApi response]', data);
+        resolve(data);
+      })
+      .catch(function(err) {
+        reject(err.message || 'Something went wrong');
+      });
+  });
+}
+function showMessage(s) {
+  var el = document.getElementById('messages');
+  if (!el) return;
+  el.innerText = s;
+  el.style.display = 'block';
+}
+function showError(s) {
+  var el = document.getElementById('errors');
+  if (!el) return;
+  el.innerText = 'Error: ' + s;
+  el.style.display = 'block';
+}
+function flashMessage(s) {
+  localStorage.setItem('flash-message', s);
+}
+function flashError(s) {
+  localStorage.setItem('flash-error', s);
+}
+function switchAuthNavigation(authorized) {
+  var elLogin = document.getElementById('nav_item_login');
+  var elProfile = document.getElementById('nav_item_profile');
+  var elLogout = document.getElementById('nav_item_logout');
+  if (elLogin) elLogin.style.display = authorized ? 'none' : 'inline-block';
+  if (elProfile) elProfile.style.display = authorized ? 'inline-block' : 'none';
+  if (elLogout) elLogout.style.display = authorized ? 'inline-block' : 'none';
+}
+function onLogout(event) {
+  event.preventDefault();
+  localStorage.removeItem('auth-token');
+  location.href = '/login';
+}
+</script>

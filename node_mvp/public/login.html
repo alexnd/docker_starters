@@ -64,7 +64,7 @@
           var node = document.querySelector('#app pre');
           loginApi(login, paswd)
             .then(function(result) {
-              console.log('*[login responce]', result);
+              console.log('*[login response]', result);
               if (result.success && result.token) {
                 localStorage.setItem('auth-token', result.token);
               }

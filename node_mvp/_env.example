@@ -8,3 +8,9 @@ API_HOST=api
 AUTH_SECRET=foobar42
 
 STATIC_PATH=public
+
+SENDMAIL_HOST=smtp.example.com
+SENDMAIL_PORT=25
+SENDMAIL_FROM=no-reply@example.com
+
+DEFAULT_LOCALE=en

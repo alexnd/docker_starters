@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+{{#if redirectUrl}}
+<meta http-equiv="refresh" content="8;url={{redirectUrl}}" />
+{{/if}}
+<title>{{ title }}</title>
+<!--<link rel="stylesheet" href="/css/main.css">-->
+<style>
+#main {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+}
+</style>
+</head>
+<body>
+<noscript>
+<strong style="font-size:1.7rem;color:red;padding:2rem">Please enable JavaScript to continue.</strong>
+</noscript>
+<div id="main">
+{{{ body }}}
+</div>
+{{#if JSONDATA}}
+<script type="application/json" id="initdata">{{{json JSONDATA }}}</script>
+<script>
+function dumpInitdata() {
+  var data = JSON.parse(document.getElementById('initdata').text);
+  console.table(data);
+}
+</script>
+{{/if}}
+{{> scripts }}
+</body>
+</html>

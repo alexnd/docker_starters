@@ -72,7 +72,6 @@ module.exports = app => {
       app.models.user
         .get({ username: userFields.username })
         .then(user => {
-          console.log('*user', user);
           if (user) {
             res.sendError(app.messages.registerUserExist, 422);
           } else {
@@ -88,7 +87,6 @@ module.exports = app => {
                 app.models.user
                   .create({...userFields, ...data})
                   .then(result => {
-                    console.log('*[user create]', typeof result, result);
                     if (result) {
                       app._auth
                         .createAccessToken({ id: result._id})
@@ -109,12 +107,12 @@ module.exports = app => {
                       res.sendError(app.messages.systemError, 500);
                     }
                   })
-                  .catch(err => res.sendError(err.message || '', 500));
+                  .catch(err => res.sendError(err.message || app.messages.systemError, 500));
               })
               .catch(err => res.sendError(err.message, 500));
           }
         })
-        .catch(err => res.sendError(err.message || '', 500));
+        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
     } else {
       res.sendError(app.messages.userFieldsRequired, 422);
     }
@@ -139,7 +137,6 @@ module.exports = app => {
     app.models.user
       .get({ _id: req.user.id })
       .then(user => {
-        console.log('*user', user);
         if (user) {
           delete user._id;
           delete user.password;
@@ -159,14 +156,12 @@ module.exports = app => {
       ...(req.body.email && {email: req.body.email}),
       ...(req.body.name && {name: req.body.name}),
     };
-    console.log('*userFields', userFields);
     if (!Object.keys(userFields).length) {
       res.sendError(app.messages.userFieldsRequired, 422);
       return;
     }
     userFields.updated_at = Date.now();
     const userUpdate = dto => {
-      console.log('*userDto', dto);
       app.models.user
         .update({ _id: req.user.id }, dto)
         .then(model => {

@@ -1,0 +1,85 @@
+{{> menu }}
+
+<h1>Registration</h1>
+
+<div style="margin-top:12px">
+  {{> messages }}
+  <form method="POST" action="" id="formLogin" onsubmit="event.preventDefault()">
+    <div style="padding:1rem">
+      <input type="text" name="username" placeholder="Username">
+    </div>
+    <div style="padding:1rem">
+      <input type="password" name="password" placeholder="Password">
+    </div>
+    <div style="padding:1rem">
+      <input type="text" name="email" placeholder="Email">
+    </div>
+    <div style="padding:1rem">
+      <input type="text" name="name" placeholder="Full Name">
+    </div>
+    <div style="padding:1rem">
+      <input type="button" value="Register" onclick="onRegister(event)">
+    </div>
+    <p>Have account? <a href="/login" style="margin-left:0.4rem">Login</a></p>
+  </form>
+</div>
+
+<script>
+function registerApi(payload) {
+  return new Promise(function(resolve, reject) {
+    fetch('/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors',
+      cache: 'no-cache',
+      body: JSON.stringify(payload)
+    })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        console.log('*[registerApi response]', data);
+        if (data) {
+          if (data.error) reject(new Error(data.error));
+          else if (data.success) resolve(data);
+          else reject(new Error('Access denied'));
+        }
+        else reject(new Error('Not implemented on server'));
+      })
+      .catch(function(err) {
+        console.error(err);
+        reject(err);
+      });
+  });
+}
+function onRegister (event) {
+  event.preventDefault();
+  var el = document.getElementById('formLogin');
+  var username = el.querySelector('input[name="username"]').value;
+  var password = el.querySelector('input[name="password"]').value;
+  var email = el.querySelector('input[name="email"]').value;
+  var name = el.querySelector('input[name="name"]').value;
+  email = email.trim();
+  if (username && password && email && email.indexOf('@') > 1) {
+    registerApi({'username':username, 'password':password, 'email':email, 'name':name})
+      .then(function(result) {
+        if (result.success) {
+          if (result.token) {
+            localStorage.setItem('auth-token', result.token);
+          }
+          showMessage('Registered successfully');
+          setTimeout(function () { location.href = '/' }, 5000);
+        } else showError('Registration failed');
+      })
+      .catch(function(err) {
+        showError(err && err.message ? err.message : 'Something went wrong');
+      });
+  } else {
+    showError('Valid user info needed');
+  }
+}
+</script>
+
+{{> footer }}

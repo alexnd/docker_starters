@@ -1,0 +1,108 @@
+{{> menu }}
+
+<h1>My profile</h1>
+
+<div style="margin-top:12px">
+  {{> messages }}
+  <form method="POST" action="" id="formProfile" onsubmit="event.preventDefault()">
+    <div style="padding:1rem">
+      <b>Username</b>: <span id="profile_username"></span>
+    </div>
+    <div style="padding:1rem">
+      <input type="text" name="email" placeholder="Email">
+    </div>
+    <div style="padding:1rem">
+      <input type="text" name="name" placeholder="Full Name">
+    </div>
+    <div style="padding:1rem">
+      <input type="password" name="password" placeholder="New Password">
+    </div>
+    <div style="padding:1rem">
+      <input type="text" name="password_confirm" placeholder="Confirm Password">
+    </div>
+    <div style="padding:1rem">
+      <input type="button" value="Update profile" onclick="onUpdateProfile(event)">
+    </div>
+    <p>
+      <a href="#" style="margin-left:0.4rem" onclick="event.preventDefault();alert('Coming soon')">Delete my account</a>
+    </p>
+  </form>
+</div>
+
+<script>
+var elForm;
+function updateProfileApi(payload) {
+  return new Promise(function(resolve, reject) {
+    fetch('/api/auth/user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + currentUser.authToken
+      },
+      mode: 'cors',
+      cache: 'no-cache',
+      body: JSON.stringify(payload)
+    })
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(data) {
+        console.log('*[updateProfileApi response]', data);
+        if (data) {
+          if (data.error) reject(new Error(data.error));
+          else if (data.success) resolve(data);
+          else reject(new Error('Access denied'));
+        }
+        else reject(new Error('Not implemented on server'));
+      })
+      .catch(function(err) {
+        console.error(err);
+        reject(err);
+      });
+  });
+}
+function onUpdateProfile (event) {
+  event.preventDefault();
+  var password = elForm.querySelector('input[name="password"]').value;
+  var password2 = elForm.querySelector('input[name="password_confirm"]').value;
+  var email = elForm.querySelector('input[name="email"]').value;
+  var name = elForm.querySelector('input[name="name"]').value;
+  email = email.trim();
+  name = name.trim();
+  password = password.trim();
+  password2 = password2.trim();
+  if (email && email.indexOf('@') > 1) {
+    if (password && password2 && password !== password2) {
+      return showError('Password confirmation not match');
+    }
+    var data = {
+      'email':email
+    }
+    if (name) data.name = name;
+    if (password) data.password = password;
+    updateProfileApi(data)
+      .then(function(result) {
+        if (result.success) {
+          showMessage('Profile updated successfully');
+          elForm.querySelector('input[name="password"]').value = '';
+          elForm.querySelector('input[name="password_confirm"]').value = '';
+        } else showError('Profile update failed');
+      })
+      .catch(function(err) {
+        showError(err && err.message ? err.message : 'Something went wrong');
+      });
+  } else {
+    showError('Enter valid email');
+  }
+}
+function pageInit() {
+  elForm = document.getElementById('formProfile')
+  if (currentUser) {
+    document.getElementById('profile_username').innerText = currentUser.username;
+    elForm.querySelector('input[name="name"]').value = currentUser.name;
+    elForm.querySelector('input[name="email"]').value = currentUser.email;
+  }
+}
+</script>
+
+{{> footer }}

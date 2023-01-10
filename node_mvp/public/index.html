@@ -28,7 +28,7 @@
           return res.json();
         })
         .then(function(data) {
-          console.log('*[responce]', data);
+          console.log('*[response]', data);
           if (node) {
             node.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
           }

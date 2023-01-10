@@ -1,0 +1,23 @@
+<ul class="nav">
+  <li{{{activeClass activeRoute 'index'}}}><a href="/">Home</a></li>
+  <li{{{activeClass activeRoute 'contacts'}}}><a href="/contacts">Contacts</a></li>
+  <li style="width:100%"></li>
+  {{#unless isLoginRoute}}
+  <li id="nav_item_login"><a href="/login">Login</a></li>
+  {{/unless}}
+  {{#unless isProfileRoute}}
+  <li style="display:none" id="nav_item_profile"><a href="/profile">Profile</a></li>
+  {{/unless}}
+  <li style="display:none" id="nav_item_logout"><a href="#logout" onclick="onLogout(event)">Logout</a></li>
+</ul>
+<div class="langs">
+  <a href="/lang/ua"{{{activeClass lang 'ua'}}}>UKR</a>
+  <a href="/lang/en"{{{activeClass lang 'en'}}}>ENG</a>
+</div>
+<style>
+ul.nav { display:flex; gap: 1rem; padding: 0; justify-content: space-between; }
+ul.nav li { list-style: none; }
+ul.nav li.active { font-weight: bold; }
+.langs { display: flex; gap: 1rem; justify-content: flex-end; margin-bottom: 1rem; }
+.langs a.active { font-weight: bold; }
+</style>
