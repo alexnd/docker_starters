@@ -39,19 +39,24 @@ module.exports = app => {
         req.headers.authorization.indexOf('Bearer ') === 0
       ) ? req.headers.authorization.split(' ')[1] : '';
       if (token) {
-        app.jwt.verify(token, process.env.AUTH_SECRET, (err, data) => {
-          if (err) {
-            console.log('*jwt.verify error', err);  
-          } else {
-            req.user = data;
-          }
+        try {
+          app.jwt.verify(token, process.env.AUTH_SECRET, (err, data) => {
+            if (err) {
+              console.log('*jwt.verify error', err);
+            } else {
+              req.user = data;
+            }
+          });
+        } catch (e) {
+          console.log('*error catch[jwt.verify]', e.message);
+        } finally {
           next();
-        });
+        }
       } else {
         next();
       }
     },
-    
+
     authenticate(credentials) {
       return new Promise((resolve, reject) => {
         if (credentials.username && credentials.password) {

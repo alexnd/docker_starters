@@ -26,7 +26,7 @@ const package = require('./package.json');
 const LOCALES = ['en', 'ua'];
 const PORT = process.env.API_PORT || 3000;
 const ADDR = process.env.API_ADDR || '0.0.0.0';
-const ROOT_PATH = process.env.ROOT_PATH || 'api';
+const ROOT_PATH = process.env.ROOT_PATH || '/api';
 const DB_COLLECTIONS = ['users', 'tasks'];
 const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, 'data');
 const sseListeners = [];
@@ -36,7 +36,12 @@ const corsHeaders = {
   // 'Access-Control-Allow-Methods-Headers': 'Accept, Host, Connection, Content-Type, Cookie, x-requested-with',
   'Access-Control-Max-Age': 2592000,
 };
-
+const store = {
+  rates: {
+    USD: 0,
+    USDT: 0,
+  },
+};
 //console.log('*[env]', process.env);
 
 // init embedded DB
@@ -73,8 +78,8 @@ const handlebars = expressHandlebars.create({
 extname: '.hbs',
 views: './views',
 helpers: {
-    json: v => JSON.stringify(v),
-    activeClass: (value, expectedValue) => { return value === expectedValue ? ' class="active"' : '' },
+  json: v => JSON.stringify(v),
+  activeClass: (value, expectedValue) => { return value === expectedValue ? ' class="active"' : '' },
 },
 });
 app.engine('.hbs', handlebars.engine);
@@ -157,6 +162,7 @@ const context = {
   NAME: process.env.APP_NAME || 'AppName',
   appPath: __dirname,
   package,
+  store,
   models: {},
   utils,
   messages,
@@ -229,7 +235,7 @@ if (process.env.STATIC_PATH) {
 app.all('*', (req, res) => {
   res.sendError(messages.notFound, 404);
 });
-  
+
 // errors handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -242,11 +248,15 @@ httpServer.listen(PORT, ADDR, () => {
 });
 
 // run cron jobs queue
-cron.schedule('*/22 * * * * *', () => {
-  const message = {ts: Date.now(), from_user: 'root', text: `Payload is ${utils.uid(12)}` };
-  wsBroadcast(message);
-  sseBroadcast(message);
-  console.log('*[cron job]', utils.dt());
+fs.readdirSync(path.resolve(__dirname, 'jobs')).forEach(file => {
+  const id = file.split('.')[0];
+  if (!id || file && !file.match('\.js$')) return;
+  const jobs = require('./jobs/' + file)(context);
+  if (!Array.isArray(jobs)) return;
+  for (const [time, cb] of jobs) {
+    console.log(`*[new cron job] ${file} ${time}`);
+    cron.schedule(time, cb);
+  }
 });
 
 // broadcast to websockets

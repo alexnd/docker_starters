@@ -4,7 +4,6 @@ module.exports = app => {
   const logoutBody = '<html><head><meta http-equiv="refresh" content="2;url=/login"></head><body><script>localStorage.removeItem("auth-token")</script></body></html>';
 
   const computeRouteVars = (req, route = '') => {
-    console.log('*req.path', req.path);
     const isRouteActive = route ? req.path.indexOf(route) === 1 : req.path === '/';
     const lang = req.getLocale();
     const vars = {
@@ -15,6 +14,7 @@ module.exports = app => {
       isProfileRoute: req.path === '/profile',
       isLangUa: lang === 'ua',
       isLangEn: lang === 'en',
+      rates: app.store.rates,
     }
     return vars;
   }

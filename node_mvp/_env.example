@@ -14,3 +14,6 @@ SENDMAIL_PORT=25
 SENDMAIL_FROM=no-reply@example.com
 
 DEFAULT_LOCALE=en
+
+#obtained at https://cryptocompare.com
+CRYPTOCOMPARE_API_KEY=
