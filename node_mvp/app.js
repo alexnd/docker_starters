@@ -244,7 +244,7 @@ app.use((err, req, res, next) => {
 
 // start server
 httpServer.listen(PORT, ADDR, () => {
-  console.log(`API server started on http://localhost:${PORT}`);
+  console.log(`API server started on http://${ADDR}:${PORT}`);
 });
 
 // run cron jobs queue
