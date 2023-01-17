@@ -26,10 +26,10 @@ module.exports = app => {
         app.fs.writeFileSync(pathTodosJson, JSON.stringify(collection));
         res.status(i === -1 ? 201 : 200).json({success: true, id});
       } catch (err) {
-        res.sendError(err.message || 'write to db failed', 500);
+        res.sendError(err.message || app.i18n.__('operationFailed'), 500);
       }
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
 
@@ -44,13 +44,13 @@ module.exports = app => {
           app.fs.writeFileSync(pathTodosJson, JSON.stringify(collection));
           res.status(200).json({success: true});
         } catch (err) {
-          res.sendError(err.message || 'write to db failed', 500);
+          res.sendError(err.message || app.i18n.__('operationFailed'), 500);
         }
       } else {
-        res.sendError(app.messages.notFound, 404);
+        res.sendError(app.i18n.__('notFound'), 404);
       }
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
 

@@ -12,7 +12,7 @@ module.exports = app => {
         return next();
       }
       const reject = () => {
-        res.sendError(app.messages.accessDenied, 401);
+        res.sendError(app.i18n.__('accessDenied'), 401);
       }
       // check for auth header
       const token = (
@@ -70,17 +70,17 @@ module.exports = app => {
                     if (success) {
                       resolve(model);
                     } else {
-                      reject({ message: app.messages.accessDenied });
+                      reject({ message: app.i18n.__('accessDenied') });
                     }
                   })
                   .catch(err => reject(err));
               } else {
-                reject({ message: app.messages.notFound });
+                reject({ message: app.i18n.__('notFound') });
               }
             })
             .catch(err => reject(err));
         } else {
-          reject({ message: app.messages.credentialsRequired });
+          reject({ message: app.i18n.__('credentialsRequired') });
         }
       });
     },

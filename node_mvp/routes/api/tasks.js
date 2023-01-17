@@ -20,7 +20,7 @@ module.exports = app => {
             res.status(200).json([]);
           }
       })
-      .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+      .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
   });
 
   // create|update task
@@ -46,7 +46,7 @@ module.exports = app => {
               res.status(200).json({success: false});
             }
           })
-          .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+          .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
       } else {
         const data = {
           user_id: req.user.id,
@@ -66,10 +66,10 @@ module.exports = app => {
               res.status(200).json({success: false});
             }
           })
-          .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+          .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
       }
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
   
@@ -93,9 +93,9 @@ module.exports = app => {
             res.status(200).json({success: false});
           }
         })
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
 
@@ -105,9 +105,9 @@ module.exports = app => {
       app.models.task
         .update({user_id: req.user.id, _id: req.body.id}, {done: req.body.done || false})
         .then(result => res.status(200).json({success: !!result}))
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
   router.post('/done/:id', app._auth.checkAuth, (req, res) => {
@@ -115,9 +115,9 @@ module.exports = app => {
       app.models.task
         .update({user_id: req.user.id, _id: req.params.id}, {done: req.body.done || false})
         .then(result => res.status(200).json({success: !!result}))
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
 
@@ -127,9 +127,9 @@ module.exports = app => {
       app.models.task
         .delete({user_id: req.user.id, _id: req.params.id})
         .then(result => res.status(200).json({success: !!result}))
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
 
@@ -139,7 +139,7 @@ module.exports = app => {
       app.models.task
         .delete({user_id: req.user.id, _id: req.body.id})
         .then(result => res.status(200).json({success: !!result}))
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else if (req.body.ids) {
       app.models.task
         .delete({user_id: req.user.id, _id: { $in: req.body.ids }})
@@ -147,9 +147,9 @@ module.exports = app => {
           console.log('*task delete by ids result', result);
           res.status(200).json({success: !!result});
         })
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.fieldsRequired, 422);
+      res.sendError(app.i18n.__('fieldsRequired'), 422);
     }
   });
 

@@ -18,14 +18,14 @@ module.exports = app => {
             if (task) {
               res.json(task);
             } else {
-              res.sendError(app.messages.notFound, 404);
+              res.sendError(app.i18n.__('notFound'), 404);
             }
           })
-          .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+          .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
       } else {
         app.models.task.all()
           .then(tasks => res.json(tasks))
-          .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+          .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
       }
     });
 
@@ -53,7 +53,7 @@ module.exports = app => {
               res.status(200).json({success: false});
             }
           })
-          .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+          .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
       } else {
         app.models.task
           .create(dto)
@@ -65,7 +65,7 @@ module.exports = app => {
               res.status(200).json({success: false});
             }
           })
-          .catch(e => res.sendError(e.message || app.messages.systemError, 500));
+          .catch(e => res.sendError(e.message || app.i18n.__('systemError'), 500));
       }
     });
 
@@ -73,13 +73,13 @@ module.exports = app => {
       if (app.fs.existsSync(pathCountriesJson))
         res.sendFile(pathCountriesJson);
       else
-        res.sendError(app.messages.notFound, 404);
+        res.sendError(app.i18n.__('notFound'), 404);
     });
 
     router.get('/users', (req, res) => {
       app.models.user.all()
         .then(result => res.status(200).json(result))
-        .catch(e => res.sendError(e.message || app.messages.systemError, 500));
+        .catch(e => res.sendError(e.message || app.i18n.__('systemError'), 500));
     });
 
     router.get('/initdata', app._auth.testAuth, (req, res) => {

@@ -25,11 +25,11 @@ module.exports = app => {
                 name: req.body.username,
               });
             })
-            .catch(err => res.sendError(err.message || app.messages.accessDenied, 401));
+            .catch(err => res.sendError(err.message || app.i18n.__('accessDenied'), 401));
         })
-        .catch(err => res.sendError(err.message || app.messages.accessDenied, 401));
+        .catch(err => res.sendError(err.message || app.i18n.__('accessDenied'), 401));
     } else {
-      res.sendError(app.messages.credentialsRequired, 422);
+      res.sendError(app.i18n__('credentialsRequired'), 422);
     }
   });
 
@@ -50,11 +50,11 @@ module.exports = app => {
                 name: req.body.username,
               });
             })
-            .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+            .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
         })
-        .catch(err => res.sendError(err.message || app.messages.accessDenied, 401));
+        .catch(err => res.sendError(err.message || app.i18n.__('accessDenied'), 401));
     } else {
-      res.sendError(app.messages.credentialsRequired, 422);
+      res.sendError(app.i18n.__('credentialsRequired'), 422);
     }
   });
 
@@ -73,7 +73,7 @@ module.exports = app => {
         .get({ username: userFields.username })
         .then(user => {
           if (user) {
-            res.sendError(app.messages.registerUserExist, 422);
+            res.sendError(app.i18n.__('registerUserExist'), 422);
           } else {
             app._auth
               .hashPassword(userFields.password)
@@ -101,20 +101,20 @@ module.exports = app => {
                           });
                         })
                         .catch(err => {
-                          res.sendError(err.message, 500);
+                          res.sendError(err.message || app.i18n.__('systemError'), 500);
                         });
                     } else {
-                      res.sendError(app.messages.systemError, 500);
+                      res.sendError(app.i18n.__('systemError'), 500);
                     }
                   })
-                  .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+                  .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
               })
-              .catch(err => res.sendError(err.message, 500));
+              .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
           }
         })
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.userFieldsRequired, 422);
+      res.sendError(app.i18n.__('userFieldsRequired'), 422);
     }
   });
 
@@ -143,10 +143,10 @@ module.exports = app => {
           delete user.restore_token;
           res.json(user);
         } else {
-          res.sendError(app.messages.notFound, 404);
+          res.sendError(app.i18n.__('notFound'), 404);
         }
       })
-      .catch(err => res.sendError(err.message, 500));
+      .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
   });
 
   // update user's profile 
@@ -157,7 +157,7 @@ module.exports = app => {
       ...(req.body.name && {name: req.body.name}),
     };
     if (!Object.keys(userFields).length) {
-      res.sendError(app.messages.userFieldsRequired, 422);
+      res.sendError(app.i18n.__('userFieldsRequired'), 422);
       return;
     }
     userFields.updated_at = Date.now();
@@ -172,7 +172,7 @@ module.exports = app => {
             res.status(200).json({ success: false });
           }
         })
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     }
     app.models.user
       .get({_id: req.user.id})
@@ -189,15 +189,15 @@ module.exports = app => {
                 userFields.password = passwordHash;
                 userUpdate({...user, ...userFields});
               })
-              .catch(err => res.sendError(err.message, 500));
+              .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
           } else {
             userUpdate({...user, ...userFields});
           }
         } else {
-          res.sendError(app.messages.notFound, 404);
+          res.sendError(app.i18n.__('notFound'), 404);
         }
       })
-      .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+      .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
   });
 
   // return user's profile
@@ -213,12 +213,12 @@ module.exports = app => {
             delete user.restore_token;
             res.status(200).json(user);
           } else {
-            res.sendError(app.messages.notFound, 404);
+            res.sendError(app.i18n.__('notFound'), 404);
           }
         })
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.usernameRequired, 422);
+      res.sendError(app.i18n.__('usernameRequired'), 422);
     }
   });
 
@@ -231,12 +231,12 @@ module.exports = app => {
             // TODO: send reset login email to user.email
             res.json(user);
           } else {
-            res.sendError(app.messages.notFound, 404);
+            res.sendError(app.i18n.__('notFound'), 404);
           }
         })
-        .catch(err => res.sendError(err.message || app.messages.systemError, 500));
+        .catch(err => res.sendError(err.message || app.i18n.__('systemError'), 500));
     } else {
-      res.sendError(app.messages.userFieldsRequired, 422);
+      res.sendError(app.i18n.__('userFieldsRequired'), 422);
     }
   });
 

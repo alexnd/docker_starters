@@ -71,7 +71,7 @@ module.exports = app => {
             }
           });
         } else {
-          reject(new Error(app.messages.invalidInput));
+          reject(new Error(app.i18n.__('invalidInput')));
         }
       });
     }

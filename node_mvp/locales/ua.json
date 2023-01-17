@@ -1,3 +1,13 @@
 {
-  "authorName": "НД-Девелопмент"
+  "authorName": "НД-Девелопмент",
+  "notFound": "Не знайдено",
+  "systemError": "Системна помилка",
+  "accessDenied": "У доступі відмовлено",
+  "fieldsRequired": "Поля обов'язкові",
+  "credentialsRequired": "Потрібні облікові дані",
+  "registerUserExist": "Користувач уже зареєстрований",
+  "userFieldsRequired": "Поля користувача обов'язкові",
+  "usernameRequired": "Потрібно ім'я користувача",
+  "invalidInput": "Неправильні дані",
+  "operationFailed": "Операція не виконана"
 }

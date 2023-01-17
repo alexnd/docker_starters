@@ -20,7 +20,6 @@ const nodemailer = require('nodemailer');
 const DB = require('tingodb')().Db;
 const EventEmitter = require('events');
 const utils = require('./utils');
-const messages = require('./messages');
 const package = require('./package.json');
 
 const LOCALES = ['en', 'ua'];
@@ -165,7 +164,6 @@ const context = {
   store,
   models: {},
   utils,
-  messages,
   os,
   fs,
   db,
@@ -233,13 +231,13 @@ if (process.env.STATIC_PATH) {
 
 // 404 route
 app.all('*', (req, res) => {
-  res.sendError(messages.notFound, 404);
+  res.sendError(i18n.__('notFound'), 404);
 });
 
 // errors handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.sendError(err.message || messages.systemError, 500);
+  res.sendError(err.message || i18n.__('systemError'), 500);
 });
 
 // start server
